@@ -1,4 +1,3 @@
-// Replace this with YOUR Firebase config:
 const firebaseConfig = {
     apiKey: "AIzaSyBuSQkpBwmggXK38mzmUxiClweWiKxD5bI",
     authDomain: "woobiedinobear.firebaseapp.com",
@@ -7,10 +6,40 @@ const firebaseConfig = {
     messagingSenderId: "642703845433",
     appId: "1:642703845433:web:56be57a1da63e1ecbd85e8"
   };
-  
+
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
   const chatRef = db.ref("chatroom");
+  
+  // Ping sound
+  const pingSound = new Audio("ping.mp3");
+  
+  // Browser tab title flashing
+  let originalTitle = document.title;
+  let flashInterval = null;
+  let windowFocused = true;
+  
+  window.addEventListener("focus", () => {
+    windowFocused = true;
+    document.title = originalTitle;
+    clearInterval(flashInterval);
+    flashInterval = null;
+  });
+  
+  window.addEventListener("blur", () => {
+    windowFocused = false;
+  });
+  
+  // Pull username from URL
+  function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+  }
+  
+  const usernameFromURL = getQueryParam("user");
+  if (usernameFromURL) {
+    document.getElementById("username").value = usernameFromURL;
+  }
   
   // Send a message
   function sendMessage() {
@@ -22,7 +51,6 @@ const firebaseConfig = {
     }
   }
   
-  
   // Listen for new messages
   chatRef.on("child_added", function(snapshot) {
     const msg = snapshot.val();
@@ -31,25 +59,22 @@ const firebaseConfig = {
     const messagesContainer = document.getElementById("messages");
     messagesContainer.appendChild(messageEl);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  
+    // Play ping sound
+    pingSound.play().catch(e => console.log("Audio play blocked until user interaction"));
+  
+    // Flash browser tab title if user is away
+    if (!windowFocused && !flashInterval) {
+      flashInterval = setInterval(() => {
+        document.title = document.title === "💬 New Message!" ? originalTitle : "💬 New Message!";
+      }, 1000);
+    }
   });
   
-  // Add Enter key handler to "message" input
-document.getElementById("message").addEventListener("keydown", function (e) {
+  // Enter key triggers message send
+  document.getElementById("message").addEventListener("keydown", function(e) {
     if (e.key === "Enter") {
-      e.preventDefault(); // prevent accidental newlines
+      e.preventDefault();
       sendMessage();
     }
   });
-  // Helper to get query parameters from the URL
-function getQueryParam(param) {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(param);
-  }
-  
-  // Set username from URL query parameter
-  const usernameFromURL = getQueryParam("user");
-  if (usernameFromURL) {
-    const usernameInput = document.getElementById("username");
-    usernameInput.value = usernameFromURL;
-  }
-  
