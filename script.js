@@ -56,6 +56,28 @@ const firebaseConfig = {
     const msg = snapshot.val();
     const messageEl = document.createElement("div");
     messageEl.textContent = `${msg.name}: ${msg.text}`;
+  
+    const messagesContainer = document.getElementById("messages");
+    const currentUser = document.getElementById("username").value.trim();
+  
+    if (msg.name === currentUser) {
+      messageEl.classList.add("my-message"); // green default
+    } else {
+      messageEl.classList.add("other-message"); // amber
+    }
+  
+    messagesContainer.appendChild(messageEl);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  
+    pingSound.play().catch(e => console.log("Audio play blocked until user interaction"));
+  
+    if (!windowFocused && !flashInterval) {
+      flashInterval = setInterval(() => {
+        document.title = document.title === "💬 New Message!" ? originalTitle : "💬 New Message!";
+      }, 1000);
+    }
+  });
+    messageEl.textContent = `${msg.name}: ${msg.text}`;
     const messagesContainer = document.getElementById("messages");
     messagesContainer.appendChild(messageEl);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -69,7 +91,7 @@ const firebaseConfig = {
         document.title = document.title === "💬 New Message!" ? originalTitle : "💬 New Message!";
       }, 1000);
     }
-  });
+  ;
   
   // Enter key triggers message send
   document.getElementById("message").addEventListener("keydown", function(e) {

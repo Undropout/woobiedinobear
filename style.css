@@ -6,7 +6,9 @@ body {
     display: flex;
     justify-content: center;
   }
-  
+  #messages div {
+    margin-bottom: 0.75rem; /* creates vertical spacing */
+  }
   #chat-container {
     width: 600px;
     border: 2px solid #33ff33;
@@ -21,7 +23,13 @@ body {
     padding-bottom: 0.5rem;
     margin-bottom: 1rem;
   }
+  .my-message {
+    color: #33ff33; /* retro green */
+  }
   
+  .other-message {
+    color: #ffcc66; /* monochrome amber/gold */
+  }
   #messages {
     height: 300px;
     overflow-y: auto;
